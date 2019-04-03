@@ -1,7 +1,30 @@
+﻿# Ignore personal files
+#
+todo/
+git_*.cmd
+
+
+# generated
+#
+*.dll_manifest.rc
+*.dll_manifest.res
+*.dll_manifest.bak
+*.exe_manifest.rc
+*.exe_manifest.res
+*.exe_manifest.bak
+*.dll.embed.manifest
+*.exe.embed.manifest
+*.exe.manifest
+
+
+####################################################
+# Filters C++ Compile-Result
+#
+
 # Prerequisites
 *.d
 
-# Compiled Object files
+# Object files
 *.slo
 *.lo
 *.o
@@ -11,7 +34,7 @@
 *.gch
 *.pch
 
-# Compiled Dynamic libraries
+# Dynamic libraries
 *.so
 *.dylib
 *.dll
@@ -20,13 +43,97 @@
 *.mod
 *.smod
 
-# Compiled Static libraries
+# Static libraries
 *.lai
 *.la
 *.a
 *.lib
+!*.plist.lib
 
 # Executables
 *.exe
 *.out
 *.app
+
+# Debug Database
+*.pdb
+
+# Fast Link database
+*.ilk
+
+# other
+*.exp
+
+####################################################
+# At Last Standard-Filters
+#
+
+# Mac OS X clutter
+#
+*.DS_Store
+
+# Windows clutter
+Thumbs.db
+
+# Xcode
+#
+build/
+*.pbxuser
+!default.pbxuser
+*.mode1v3
+!default.mode1v3
+*.mode2v3
+!default.mode2v3
+*.perspectivev3
+!default.perspectivev3
+xcuserdata
+*.xccheckout
+*.moved-aside
+DerivedData
+*.hmap
+*.ipa
+*.xcuserstate
+project.xcworkspace
+
+# Intellij IDEs
+.idea/
+# Intellij IDEA (see https://intellij-support.jetbrains.com/entries/23393067)
+.idea/workspace.xml
+.idea/tasks.xml
+# Android/IntelliJ IDEs
+#
+build/
+.build/
+.gradle/
+.nb-gradle/
+*.iml
+local.properties
+#gradle.properties
+
+# Visual Studio Code
+#
+.vscode/
+
+# ignore XD Creator IDE (backup or generated files)
+#
+*.user
+*.user.*
+*.autosave
+*.xd_backup
+"*.properties~"
+
+
+# node.js
+#
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# BUCK
+buck-out/
+\.buckd/
+*.keystore
+
+# Bundle artifact
+*.jsbundle
+
