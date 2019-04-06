@@ -2,7 +2,6 @@
 #include "ui_mainview.h"
 
 #include <main-tool.h>
-#include <feature/convert-thread.h>
 #include <service/apptool.h>
 
 #include <QFileDialog>
@@ -16,6 +15,8 @@ MainView::MainView(QWidget *parent)
 {
     ui->setupUi(this);
 
+    this->setWindowTitle(qApp->applicationName());
+
     connect(qApp->systemTray.restoreAction, &QAction::triggered
             , this, &MainView::showNormal);
     qApp->systemTray.icon->setVisible(true);
@@ -25,10 +26,13 @@ MainView::MainView(QWidget *parent)
     foreach (const QByteArray &format, formats) {
         ui->formatCombo->addItem(format);
     }
-    ui->formatCombo->setCurrentText(QLL("jpg"));
-
+    ui->formatCombo->setCurrentText(QLL("png"));
+    // Drop-down menu
     QAction *a = new QAction(tr("&Stop Operation"), this);
     connect(a, &QAction::triggered, this, &MainView::onAbort);
+    ui->convertButton->addAction(a);
+    a = new QAction(tr("&List files"), this);
+    connect(a, &QAction::triggered, this, &MainView::onListFiles);
     ui->convertButton->addAction(a);
     ui->convertButton->setContextMenuPolicy(Qt::ActionsContextMenu);
 }
@@ -59,6 +63,16 @@ int MainView::convertFile(const QFileInfo &in, const QFileInfo &out, const QStri
     return 0; // Success
 }
 
+QString MainView::getDefaultOutputPath() const
+{
+    QString &path = ui->inputEdit->text();
+    if ( ! path.isEmpty()) {
+        path += QDir::separator();
+    }
+    path += QLL("output");
+    return QDir::cleanPath(path);
+}
+
 void MainView::log(const QString &msg, int id)
 {
     Q_UNUSED(id)
@@ -73,6 +87,30 @@ void MainView::closeEvent(QCloseEvent *event)
     } else {
         event->ignore();
     }
+}
+
+void MainView::startOperation(ConvertThread::OperationMode mode)
+{
+    if ( ! this->askAbort())
+        return;
+    // Validate arguments
+    const QString &inputPath = ui->inputEdit->text();
+    if ( ! validateDir(inputPath, tr("Input"))) {
+        ui->inputEdit->setFocus();
+        return;
+    }
+    QString &outputPath = ui->outputEdit->text();
+    if (outputPath.isEmpty()) {
+        outputPath = getDefaultOutputPath();
+        ui->outputEdit->setText(outputPath);
+    }
+    const QString &outputFormat = ui->formatCombo->currentText();
+    // Start operation
+    m_thread = new ConvertThread();
+    connect(m_thread, &ConvertThread::finished, this, &MainView::onThreadFinish);
+    connect(m_thread, &ConvertThread::log, this, &MainView::log, Qt::QueuedConnection);
+    m_thread->setMode(mode);
+    m_thread->start(inputPath, outputPath, outputFormat);
 }
 
 bool MainView::askAbort()
@@ -91,10 +129,22 @@ bool MainView::askAbort()
     return true;
 }
 
-bool MainView::isDirValid(const QString &path)
+bool MainView::validateDir(const QString &path, const QString &name)
 {
-    QDir dir(path);
-    return dir.exists();
+    QString msg;
+    if (path.isEmpty()) {
+        msg = tr("%1 directory is not set").arg(name);
+    }
+    QDir dir( path );
+    if ( ! dir.exists() ) {
+        msg = tr("%1 directory does not exist: %2").arg(name, path);
+    }
+    if ( ! msg.isEmpty()) {
+        qApp->toast( msg );
+        qApp->beep();
+        return false;
+    }
+    return true;
 }
 
 void MainView::onThreadFinish()
@@ -108,11 +158,18 @@ void MainView::on_browseButton_clicked()
 {
     const QString &path = QFileDialog::getExistingDirectory(this);
     if ( ! path.isEmpty() ) {
-        const QString &outputPath = ui->outputEdit->text();
-        if (outputPath.isEmpty() || outputPath == ui->inputEdit->text()) {
-            ui->outputEdit->setText(path);
-        }
+        QString &lastInputPath = ui->inputEdit->text();
+        // Must be before input-path update
+        QString &lastDefaultOutputPath = getDefaultOutputPath();
+        // Update input and output paths
         ui->inputEdit->setText(path);
+        const QString &outputPath = ui->outputEdit->text();
+        if (outputPath.isEmpty()
+                || outputPath == lastInputPath
+                || outputPath == lastDefaultOutputPath)
+        {
+            ui->outputEdit->setText(getDefaultOutputPath());
+        }
     }
 }
 
@@ -124,28 +181,4 @@ void MainView::on_outputSelect_clicked()
     }
 }
 
-void MainView::on_convertButton_clicked()
-{
-    if ( ! this->askAbort())
-        return;
-    // Validate arguments
-    const QString &pathErrorMessage = tr("Folder does not exist: %1");
-    const QString &inputPath = ui->inputEdit->text();
-    if ( ! isDirValid(inputPath)) {
-        qApp->toast(pathErrorMessage.arg(inputPath));
-        ui->inputEdit->setFocus();
-        return;
-    }
-    const QString &outputPath = ui->outputEdit->text();
-    if ( ! isDirValid(outputPath)) {
-        qApp->toast(pathErrorMessage.arg(outputPath));
-        ui->outputEdit->setFocus();
-        return;
-    }
-    const QString &outputFormat = ui->formatCombo->currentText();
-    // Start operation
-    m_thread = new ConvertThread();
-    connect(m_thread, &ConvertThread::finished, this, &MainView::onThreadFinish);
-    connect(m_thread, &ConvertThread::log, this, &MainView::log, Qt::QueuedConnection);
-    m_thread->start(inputPath, outputPath, outputFormat);
-}
+

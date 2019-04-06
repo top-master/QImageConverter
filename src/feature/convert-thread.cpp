@@ -7,13 +7,19 @@
 ConvertThread::ConvertThread()
     : m_abort(false)
     , m_inputFilter(QLatin1Char('*'))
+    , m_handler(&ConvertThread::handleLog)
 {
 }
 
-void ConvertThread::start(const QString &inputPath, const QString &outputPath, const QString &outputFormat)
+void ConvertThread::start(const QString &inputPath
+        , const QString &outputPath, const QString &outputFormat)
 {
     this->stop();
-    m_inputPath = inputPath;
+    // Ensures paths are never mistaken
+    m_inputPath = QDir(inputPath).absolutePath();
+    if ( ! m_inputPath.endsWith(QLatin1Char('/')))
+        m_inputPath += QLatin1Char('/');
+    m_inputPath.squeeze();
     m_outputPath = QDir(outputPath).absolutePath();
     if ( ! m_outputPath.endsWith(QLatin1Char('/')))
         m_outputPath += QLatin1Char('/');
@@ -45,7 +51,10 @@ void ConvertThread::run()
         }
         outputPath += m_outputFormat;
         // At last convert input file to the required format
-        this->convertFile(currentPath, outputPath);
+        Context ctx;
+        ctx.input = currentPath;
+        ctx.output = outputPath;
+        (this->*m_handler)(ctx);
     }
 }
 

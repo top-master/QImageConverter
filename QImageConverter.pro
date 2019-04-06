@@ -17,6 +17,8 @@ RC_FILE = $$PWD/assets/main.rc
 
 INCLUDEPATH += $$PWD/src
 
+copyModules()
+
 copyImageDriver(svg)
 copyImageDriver(webp)
 
