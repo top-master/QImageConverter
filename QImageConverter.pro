@@ -18,6 +18,7 @@ RC_FILE = $$PWD/assets/main.rc
 INCLUDEPATH += $$PWD/src
 
 copyImageDriver(svg)
+copyImageDriver(webp)
 
 SOURCES += \
     src/component/mainview.cpp \

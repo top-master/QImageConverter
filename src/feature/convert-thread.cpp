@@ -19,6 +19,7 @@ void ConvertThread::start(const QString &inputPath, const QString &outputPath, c
         m_outputPath += QLatin1Char('/');
     m_outputPath.squeeze();
     m_outputFormat = outputFormat;
+    m_abort = false;
     super::start();
 }
 
