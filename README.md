@@ -1,12 +1,14 @@
 # QImageConverter
 
-This is an `XD`-framework based portable Image-converter that meets its initial project aim, which was the possibility to convert any `Qt4` supported input image-formats to another format which we do select, in a basic and simple way.
+This is an `XD`-framework based portable Image-converter, which provides the possibility to convert any `Qt4` supported input image-formats to another format which we do select, in a basic and simple way.
 
 ![Preview](assets/preview/main-view.png?raw=true "Windows Main preview")
 
+### Resize mode
+![Preview](assets/preview/resize-mode-view.png?raw=true "Resize-settings preview")
+
 ## Background:
-Since `PhotoShop` did not support `SVG` and `WebP` formats (at the time of writing), I was asked to develop a small App that does convert all the `SVG` and `WebP` files in a specified folder to the format which we select,
-but I still do not know why `PhotoShop` does not yet support those formats even in year `2019`!
+Since `PhotoShop` did not support `SVG` and `WebP` formats (at the time of writing), I was asked to develop a small App that does convert all the `SVG` and `WebP` files in a specified folder to the format which we select.
 
 (source-code: https://github.com/top-master/QImageConverter)
 
@@ -28,7 +30,7 @@ but I still do not know why `PhotoShop` does not yet support those formats even 
    - put in "qmake location" field the `XD` framework's qmake-executable address (e.g. "`C:/XD/bin/qmake.exe`")
    - also set the "`Version name`" field to "`MyXD`"
 
-4. Still in `Qt-Creator` [Create a build tool-kit and conigure it](https://bitbucket.org/top-master/xd/src/master/doc/qt-creator/targets.md) like:
+4. Still in `Qt-Creator` [Create a build tool-kit and configure it](https://bitbucket.org/top-master/xd/src/master/doc/qt-creator/targets.md) like:
    - in "`Qt Version`" Drop-down menu select "`MyXD`" (which you added in previous step)
    - in `"Compiler"` Drop-down menu select the auto-detected one with `x86` architecture (or even [configure compiler](https://bitbucket.org/top-master/xd/src/master/doc/qt-creator/tool-chains.md) manually)
 

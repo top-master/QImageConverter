@@ -48,6 +48,13 @@ int main(int argc, char *argv[])
                 , valueName, QString()
             );
         parser.addOption(formatOption);
+        // Accept output resize-mode
+        const QString &resizeArg = QLL("resize");
+        QCommandLineOption resizeOption( resizeArg
+                , QLL("output resize-settings")
+                , valueName, QString()
+            );
+        parser.addOption(resizeOption);
         parser.process(app);
 
         if(parser.isSet(inputOption) || parser.isSet(outputArg)) {
@@ -67,7 +74,8 @@ int main(int argc, char *argv[])
                     return OutputExists;
                 }
             }
-            return MainView::convertFile(inputInfo, outputInfo, parser.value(formatOption));
+            ResizeMode &resizeMode = ResizeMode::fromString( parser.value(resizeOption) );
+            return MainView::convertFile(inputInfo, outputInfo, parser.value(formatOption), resizeMode);
         }
         // Prepare services
         app.prepare();

@@ -3,6 +3,8 @@
 
 #include <feature/convert-thread.h>
 
+#include <component/resize-mode.h>
+
 #include <QWidget>
 #include <QFileInfo>
 
@@ -20,7 +22,8 @@ public:
     ~MainView();
 
     static int convertFile(const QFileInfo &in, const QFileInfo &out
-            , const QString &format = QString());
+            , const QString &format = QString()
+            , ResizeMode & = ResizeMode());
 
     QString getDefaultOutputPath() const;
 
@@ -41,6 +44,7 @@ private slots:
     void onThreadFinish();
     void onAbort() { this->askAbort(); }
     void onListFiles() { startOperation(ConvertThread::OpLogOnly); }
+    void onResizeMode(bool checked);
 
     void on_browseButton_clicked();
     void on_outputSelect_clicked();
@@ -49,6 +53,8 @@ private slots:
 private:
     Ui::MainView *ui;
     ConvertThread *m_thread;
+    QAction *m_resizeModeAction;
+    ResizeMode m_resizeMode;
 };
 
 #endif // MAINVIEW_H

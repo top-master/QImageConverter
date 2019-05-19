@@ -38,6 +38,9 @@ void ConvertThread::run()
     QDirIterator it(m_inputPath, QStringList() << m_inputFilter, QDir::Files, QDirIterator::Subdirectories);
     while (it.hasNext() && m_abort == false) {
         const QString &currentPath = it.next();
+        if ( currentPath.startsWith(m_outputPath) ) {
+            continue;
+        }
         outputPath.resize(outputRootSize);
         outputPath += currentPath.midRef(m_inputPath.size());
         // Change output format
@@ -64,11 +67,14 @@ bool ConvertThread::convertFile(const QString &inputFile
     // Prepare
     QProcess p;
     p.setProgram( qApp->applicationFilePath() );
-    p.setArguments(
-            QStringList() << QLL("--input") << inputFile
-            << QLL("--output") << outputFile
-            << QLL("--format") << m_outputFormat
-        );
+    QStringList args;
+    args << QLL("--input") << inputFile
+        << QLL("--output") << outputFile
+        << QLL("--format") << m_outputFormat;
+    if ( m_resizeMode.enabled ) {
+        args << QLL("--resize") << m_resizeMode.toString();
+    }
+    p.setArguments( args );
     // Launch and wait for result
     p.start();
     bool r = p.waitForFinished( msecs );
