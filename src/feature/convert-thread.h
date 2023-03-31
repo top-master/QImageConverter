@@ -1,6 +1,8 @@
 #ifndef CONVERTTHREAD_H
 #define CONVERTTHREAD_H
 
+#include <component/resize-mode.h>
+
 #include <QThread>
 #include <QImageReader>
 #include <QImageWriter>
@@ -43,6 +45,7 @@ public:
             break;
         }
     }
+    void setResizeMode(const ResizeMode &v) { m_resizeMode = v; }
 
 signals:
     void log(const QString &msg, int id = -1);
@@ -77,6 +80,7 @@ private:
     QString m_inputFilter;
     QString m_outputPath;
     QString m_outputFormat;
+    ResizeMode m_resizeMode;
 };
 
 #endif // CONVERTTHREAD_H
